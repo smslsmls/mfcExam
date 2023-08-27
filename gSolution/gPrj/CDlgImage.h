@@ -14,6 +14,8 @@ public:
 
 	CImage m_image;
 	CWnd* m_pParent;
+	int m_nDataCount = 0;
+	CPoint m_ptData[100];
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -28,5 +30,7 @@ public:
 	afx_msg void OnBnClickedBtnUpParent();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
+private:
 	void InitImage();
+	void drawData(CDC* pDC);
 };
