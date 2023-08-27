@@ -2,17 +2,17 @@
 //
 
 #include "pch.h"
-#include "gPrj.h"
+#include "gProject.h"
 #include "afxdialogex.h"
 #include "CDlgImage.h"
-
+#include <iostream>
 
 // CDlgImage 대화 상자
 
 IMPLEMENT_DYNAMIC(CDlgImage, CDialogEx)
 
 CDlgImage::CDlgImage(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_CDlgImage, pParent)
+	: CDialogEx(IDD_CDLGIMAGE, pParent)
 {
 	m_pParent = pParent;
 }
@@ -28,33 +28,11 @@ void CDlgImage::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDlgImage, CDialogEx)
-	ON_BN_CLICKED(IDC_BTN_UP_PARENT, &CDlgImage::OnBnClickedBtnUpParent)
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
 // CDlgImage 메시지 처리기
-
-#include "gPrjDlg.h"
-void CDlgImage::OnBnClickedBtnUpParent()
-{
-	static int n = 100;
-	CgPrjDlg* pDlg = (CgPrjDlg*)m_pParent;
-	pDlg->callFunc(n++);
-}
-
-
-BOOL CDlgImage::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-
-	MoveWindow(0, 0, 640, 480);
-
-	InitImage();
-
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
-}
 
 
 void CDlgImage::OnPaint()
@@ -71,12 +49,22 @@ void CDlgImage::OnPaint()
 }
 
 
+BOOL CDlgImage::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	MoveWindow(0, 0, 640, 480);
+
+	InitImage();
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
+}
+
 void CDlgImage::InitImage()
 {
-	//int nWidth = 640;
-	//int nHeight = 480;
-	int nWidth = 4096*8;
-	int nHeight = 4096*8;
+	int nWidth = 640;
+	int nHeight = 480;
 	int nBpp = 8;
 
 	m_image.Create(nWidth, -nHeight, nBpp);
@@ -103,11 +91,30 @@ void CDlgImage::drawData(CDC* pDC)
 	CPen pen;
 	pen.CreatePen(PS_SOLID, 2, COLOR_RED);
 	CPen* pOldPen = pDC->SelectObject(&pen);
+	if (m_ptCentor.x >= 0 && m_ptCentor.y >= 0)
+	{
+		ChangePen(pDC, &pen, COLOR_YELLOW);
+		rect.SetRect(m_ptCentor, m_ptCentor);
+		rect.InflateRect(10, 10);
+		pDC->Ellipse(rect);
+		ChangePen(pDC, &pen, COLOR_RED);
+		pDC->MoveTo(m_ptCentor.x - 6, m_ptCentor.y);
+		pDC->LineTo(m_ptCentor.x + 5, m_ptCentor.y);
+		pDC->MoveTo(m_ptCentor.x, m_ptCentor.y - 6);
+		pDC->LineTo(m_ptCentor.x, m_ptCentor.y + 5);
+	}
 	for (int i = 0; i < m_nDataCount; i++)
 	{
 		rect.SetRect(m_ptData[i], m_ptData[i]);
-		rect.InflateRect(1, 1);
+		rect.InflateRect(5, 5);
 		pDC->Ellipse(rect);
 	}
 	pDC->SelectObject(pOldPen);
+}
+
+void CDlgImage::ChangePen(CDC* pDC, CPen* pPen, COLORREF crColor)
+{
+	pPen->DeleteObject();
+	pPen->CreatePen(PS_SOLID, 2, crColor);
+	pDC->SelectObject(pPen);
 }

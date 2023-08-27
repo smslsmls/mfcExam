@@ -12,8 +12,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#endif
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+#endif
 using namespace std;
 
 

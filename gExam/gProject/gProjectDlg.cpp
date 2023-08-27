@@ -7,9 +7,11 @@
 #include "gProject.h"
 #include "gProjectDlg.h"
 #include "afxdialogex.h"
+#include <iostream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
 
 
@@ -52,6 +54,7 @@ END_MESSAGE_MAP()
 
 CgProjectDlg::CgProjectDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_GPROJECT_DIALOG, pParent)
+	, m_nNum(10)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -59,12 +62,16 @@ CgProjectDlg::CgProjectDlg(CWnd* pParent /*=nullptr*/)
 void CgProjectDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_VALUE, m_nNum);
 }
 
 BEGIN_MESSAGE_MAP(CgProjectDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BTN_CREATE, &CgProjectDlg::OnBnClickedBtnCreate)
+	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BTN_GET_DATA, &CgProjectDlg::OnBnClickedBtnGetData)
 END_MESSAGE_MAP()
 
 
@@ -100,6 +107,9 @@ BOOL CgProjectDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	m_pDlgImage = new CDlgImage;
+	m_pDlgImage->Create(IDD_CDLGIMAGE, this);
+	m_pDlgImage->ShowWindow(SW_SHOW);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -153,3 +163,58 @@ HCURSOR CgProjectDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CgProjectDlg::OnBnClickedBtnCreate()
+{
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+	UpdateData(TRUE);
+	for (int i = 0; i < m_nNum; i++)
+	{
+		int x = rand() % nWidth;
+		int y = rand() % nHeight;
+		m_pDlgImage->m_ptData[i].x = x;
+		m_pDlgImage->m_ptData[i].y = y;
+	}
+	std::cout << m_nNum << std::endl;
+	m_pDlgImage->m_nDataCount = m_nNum;
+
+	m_pDlgImage->Invalidate();
+	UpdateData(false);
+}
+
+
+void CgProjectDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	if (m_pDlgImage) delete m_pDlgImage;
+}
+
+
+void CgProjectDlg::OnBnClickedBtnGetData()
+{
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+
+	int nSumX = 0;
+	int nSumY = 0;
+	int nCount = m_pDlgImage->m_nDataCount;
+
+	for (int i = 0; i < nCount; i++)
+	{
+		nSumX += m_pDlgImage->m_ptData[i].x;
+		nSumY += m_pDlgImage->m_ptData[i].y;
+	}
+
+	int nCentorX = nSumX / nCount;
+	int nCentorY = nSumY / nCount;
+
+	m_pDlgImage->m_ptCentor.x = nCentorX;
+	m_pDlgImage->m_ptCentor.y = nCentorY;
+
+	m_pDlgImage->Invalidate();
+}
