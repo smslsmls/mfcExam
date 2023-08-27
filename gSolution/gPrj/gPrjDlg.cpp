@@ -24,15 +24,15 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 대화 상자 데이터입니다.
+	// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
-// 구현입니다.
+	// 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(CgPrjDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_PROCESS, &CgPrjDlg::OnBnClickedBtnProcess)
 	ON_BN_CLICKED(IDC_BTN_MAKE_PATTERN, &CgPrjDlg::OnBnClickedBtnMakePattern)
 	ON_BN_CLICKED(IDC_BTN_GET_DATA, &CgPrjDlg::OnBnClickedBtnGetData)
+	ON_BN_CLICKED(IDC_BTN_THREAD, &CgPrjDlg::OnBnClickedBtnThread)
 END_MESSAGE_MAP()
 
 
@@ -236,12 +237,16 @@ void CgPrjDlg::OnBnClickedBtnTest()
 
 #include "Process.h" 
 #include <chrono>
+
+using namespace std;
+using namespace chrono;
+
 void CgPrjDlg::OnBnClickedBtnProcess()
 {
 	CProcess process;
 
 	auto start = std::chrono::system_clock::now();
-	int nRet = process.getStarInfo(&m_pDlgImage->m_image,100);
+	int nRet = process.getStarInfo(&m_pDlgImage->m_image, 100);
 	auto end = std::chrono::system_clock::now();
 	auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
@@ -263,7 +268,7 @@ void CgPrjDlg::OnBnClickedBtnMakePattern()
 	{
 		for (int i = rect.left; i < rect.right; i++)
 		{
-			fm[j * nPitch + i] = rand()%0xff;
+			fm[j * nPitch + i] = rand() % 0xff;
 		}
 	}
 
@@ -299,4 +304,67 @@ void CgPrjDlg::OnBnClickedBtnGetData()
 	double dCentorY = (double)nSumY / nCount;
 
 	cout << dCentorX << "\t" << dCentorY << endl;
+}
+
+#include <thread>
+void threadProcess(CWnd* pParent, CRect rect, int* nRet)
+{
+	CgPrjDlg* pWnd = (CgPrjDlg*)pParent;
+	*nRet = pWnd->processImg(rect);
+}
+
+void CgPrjDlg::OnBnClickedBtnThread()
+{
+	auto start = system_clock::now();
+
+	int nImgSize = 4096 * 4;
+	CRect rect(0, 0, 4096 * 4, 4096 * 4);
+	CRect rt[4];
+	int nRet[4] = {};
+
+	for (int k = 0; k < 4; k++)
+	{
+		rt[k] = rect;
+		rt[k].OffsetRect(nImgSize * (k % 2), nImgSize * int(k / 2));
+	}
+
+	thread _thread0(threadProcess, this, rt[0], &nRet[0]);
+	thread _thread1(threadProcess, this, rt[1], &nRet[1]);
+	thread _thread2(threadProcess, this, rt[2], &nRet[2]);
+	thread _thread3(threadProcess, this, rt[3], &nRet[3]);
+
+	_thread0.join();
+	_thread1.join();
+	_thread2.join();
+	_thread3.join();
+
+	//_thread0.detach();
+	//_thread1.detach();
+	//_thread2.detach();
+	//_thread3.detach();
+
+	int nSum = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		nSum += nRet[i];
+	}
+
+	auto end = system_clock::now();
+	auto millisec = duration_cast<milliseconds>(end - start);
+	cout << nSum << '\t' << millisec.count() * 0.001 << "sec" << endl;
+}
+
+int CgPrjDlg::processImg(CRect rect)
+{
+	auto start = system_clock::now();
+
+	CProcess process;
+
+	int nRet = process.getStarInfo(&m_pDlgImage->m_image, 0, rect);
+
+	auto end = system_clock::now();
+	auto millisec = duration_cast<milliseconds>(end - start);
+	cout << nRet << '\t' << millisec.count() * 0.001 << "sec" << endl;
+
+	return nRet;
 }
