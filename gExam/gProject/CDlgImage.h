@@ -15,8 +15,8 @@ public:
 
 	CImage m_image;
 	CWnd* m_pParent;
-	int m_nDataCount = 0;
-	CPoint m_ptData[MAX_POINT];
+	int m_nDataSize = 0;
+	CPoint m_ptData;
 	CPoint m_ptCentor = { -1,-1 };
 
 // 대화 상자 데이터입니다.

@@ -171,15 +171,13 @@ void CgProjectDlg::OnBnClickedBtnCreate()
 	int nHeight = m_pDlgImage->m_image.GetHeight();
 	int nPitch = m_pDlgImage->m_image.GetPitch();
 	UpdateData(TRUE);
-	for (int i = 0; i < m_nNum; i++)
-	{
-		int x = rand() % nWidth;
-		int y = rand() % nHeight;
-		m_pDlgImage->m_ptData[i].x = x;
-		m_pDlgImage->m_ptData[i].y = y;
-	}
-	std::cout << m_nNum << std::endl;
-	m_pDlgImage->m_nDataCount = m_nNum;
+	int x = rand() % nWidth;
+	int y = rand() % nHeight;
+	m_pDlgImage->m_ptData.x = x;
+	m_pDlgImage->m_ptData.y = y;
+	m_pDlgImage->m_ptCentor.x = x;
+	m_pDlgImage->m_ptCentor.y = y;
+	m_pDlgImage->m_nDataSize = m_nNum;
 
 	m_pDlgImage->Invalidate();
 	UpdateData(false);
@@ -196,25 +194,25 @@ void CgProjectDlg::OnDestroy()
 
 void CgProjectDlg::OnBnClickedBtnGetData()
 {
-	int nWidth = m_pDlgImage->m_image.GetWidth();
-	int nHeight = m_pDlgImage->m_image.GetHeight();
-	int nPitch = m_pDlgImage->m_image.GetPitch();
+	//int nWidth = m_pDlgImage->m_image.GetWidth();
+	//int nHeight = m_pDlgImage->m_image.GetHeight();
+	//int nPitch = m_pDlgImage->m_image.GetPitch();
 
-	int nSumX = 0;
-	int nSumY = 0;
-	int nCount = m_pDlgImage->m_nDataCount;
+	//int nSumX = 0;
+	//int nSumY = 0;
+	//int nCount = m_pDlgImage->m_nDataCount;
 
-	for (int i = 0; i < nCount; i++)
-	{
-		nSumX += m_pDlgImage->m_ptData[i].x;
-		nSumY += m_pDlgImage->m_ptData[i].y;
-	}
+	//for (int i = 0; i < nCount; i++)
+	//{
+	//	nSumX += m_pDlgImage->m_ptData[i].x;
+	//	nSumY += m_pDlgImage->m_ptData[i].y;
+	//}
 
-	int nCentorX = nSumX / nCount;
-	int nCentorY = nSumY / nCount;
+	//int nCentorX = nSumX / nCount;
+	//int nCentorY = nSumY / nCount;
 
-	m_pDlgImage->m_ptCentor.x = nCentorX;
-	m_pDlgImage->m_ptCentor.y = nCentorY;
+	//m_pDlgImage->m_ptCentor.x = nCentorX;
+	//m_pDlgImage->m_ptCentor.y = nCentorY;
 
-	m_pDlgImage->Invalidate();
+	//m_pDlgImage->Invalidate();
 }

@@ -89,26 +89,18 @@ void CDlgImage::drawData(CDC* pDC)
 {
 	CRect rect;
 	CPen pen;
-	pen.CreatePen(PS_SOLID, 2, COLOR_RED);
+	pen.CreatePen(PS_SOLID, 2, COLOR_YELLOW);
 	CPen* pOldPen = pDC->SelectObject(&pen);
-	if (m_ptCentor.x >= 0 && m_ptCentor.y >= 0)
-	{
-		ChangePen(pDC, &pen, COLOR_YELLOW);
-		rect.SetRect(m_ptCentor, m_ptCentor);
-		rect.InflateRect(10, 10);
-		pDC->Ellipse(rect);
-		ChangePen(pDC, &pen, COLOR_RED);
-		pDC->MoveTo(m_ptCentor.x - 6, m_ptCentor.y);
-		pDC->LineTo(m_ptCentor.x + 5, m_ptCentor.y);
-		pDC->MoveTo(m_ptCentor.x, m_ptCentor.y - 6);
-		pDC->LineTo(m_ptCentor.x, m_ptCentor.y + 5);
-	}
-	for (int i = 0; i < m_nDataCount; i++)
-	{
-		rect.SetRect(m_ptData[i], m_ptData[i]);
-		rect.InflateRect(5, 5);
-		pDC->Ellipse(rect);
-	}
+	rect.SetRect(m_ptData, m_ptData);
+	rect.InflateRect(m_nDataSize, m_nDataSize);
+	pDC->Ellipse(rect);
+	ChangePen(pDC, &pen, COLOR_RED);
+	std::cout << m_ptCentor.x << ' ' << m_ptCentor.y << ' ' << m_nDataSize << std::endl;
+	pDC->MoveTo(m_ptCentor.x - (m_nDataSize / 2 + 1), m_ptCentor.y);
+	pDC->LineTo(m_ptCentor.x + (m_nDataSize / 2), m_ptCentor.y);
+	pDC->MoveTo(m_ptCentor.x, m_ptCentor.y - (m_nDataSize / 2 + 1));
+	pDC->LineTo(m_ptCentor.x, m_ptCentor.y + (m_nDataSize / 2));
+	
 	pDC->SelectObject(pOldPen);
 }
 
